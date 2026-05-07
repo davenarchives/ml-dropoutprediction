@@ -1,33 +1,36 @@
             <section id="eda" class="content-section">
                 <div class="section-head">
                     <div>
-                        <p class="eyebrow">EDA Results</p>
-                        <h2>Exploratory Findings</h2>
-                        <p class="lead">The class mix and feature rankings help explain why financial status and academic progress deserve prominent treatment in the risk demo.</p>
+                        <p class="eyebrow">Exploratory Data Analysis</p>
+                        <h2>Exploratory Data Analysis</h2>
+                        <p class="lead">The visual analysis shows how academic progress, financial standing, and student background separate dropout and non-dropout patterns.</p>
                     </div>
                 </div>
                 <div class="asset-grid">
                     <article class="chart-card">
                         <h3>Target Variable Distribution</h3>
                         <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/targetvariabledistribution.png') }}" alt="Target variable distribution chart">
-                        <p>The dataset is imbalanced: 3,003 Non-Dropout records and 1,421 Dropout records.</p>
+                        <p>The dataset is imbalanced: 3,003 students are Non-Dropout while 1,421 are Dropout, so the model needs to learn from fewer dropout examples.</p>
                     </article>
                     <article class="chart-card">
                         <h3>Top 10 Features</h3>
                         <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/top10features.png') }}" alt="Top 10 feature importance chart">
-                        <p>Academic progress, tuition status, and financial signals are the most useful model inputs.</p>
+                        <p>Second-semester approved units, semester grades, first-semester progress, and tuition status carry the strongest signal, showing that recent academic performance drives the prediction most.</p>
                     </article>
                     <article class="chart-card">
                         <h3>Distribution by Target</h3>
                         <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/distributionbytarget.png') }}" alt="Distribution by target EDA chart">
+                        <p>Dropout cases cluster around very low approved units, while non-dropout students concentrate around higher completed units, making approved units a clear risk separator.</p>
                     </article>
                     <article class="chart-card">
                         <h3>Financial Factors by Target</h3>
                         <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/financialfactorsbytarget.png') }}" alt="Financial factors by target chart">
+                        <p>Late tuition payments and lack of scholarship support appear more often among dropout records, suggesting that financial pressure is closely tied to persistence risk.</p>
                     </article>
                     <article class="chart-card">
                         <h3>Demographic Factors</h3>
                         <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/demographicfactors.png') }}" alt="Demographic factors chart">
+                        <p>Dropout students trend older at enrollment, and the gender split shows higher dropout share among male students in this dataset, adding useful context alongside academic signals.</p>
                     </article>
                 </div>
             </section>
