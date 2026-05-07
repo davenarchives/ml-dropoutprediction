@@ -1,0 +1,116 @@
+            <section id="predictor" class="content-section">
+                <div class="predictor-hero">
+                    <h2 class="predictor-title">Student Dropout <em>Risk Predictor</em></h2>
+                    <p class="lead">Enter the 29 dataset features described in the project schema to generate a dropout risk assessment informed by the tuned Random Forest classifier trained on 4,424 student records.</p>
+                </div>
+                <div class="predictor-grid">
+                    <form class="predictor-shell" id="predictorForm" data-api-url="{{ url_for('dashboard.predict_api') }}">
+                        <div class="tabs" role="tablist" aria-label="Predictor input categories">
+                            {% for section in sections %}
+                                {% set tab_id = section.title|lower|replace(' ', '-') %}
+                                <button class="tab-btn {% if loop.first %}active{% endif %}" type="button" data-tab-target="{{ tab_id }}">
+                                    {{ section.title }}
+                                </button>
+                            {% endfor %}
+                        </div>
+
+                        {% for section in sections %}
+                            {% set tab_id = section.title|lower|replace(' ', '-') %}
+                            <div class="accordion {% if loop.first %}active{% endif %}" id="{{ tab_id }}">
+                                <details open>
+                                    <summary>{{ section.title }} <ion-icon name="chevron-down-outline" aria-hidden="true"></ion-icon></summary>
+                                    <div class="fields-grid">
+                                        {% for field in section.fields %}
+                                            {% set field_id = "feature_" ~ loop.index ~ "_" ~ tab_id %}
+                                            {% set current_value = form_values.get(field.name, field.default|string) %}
+                                            <div class="field" data-field-card>
+                                                <label for="{{ field_id }}">{{ field.label }}</label>
+                                                {% if field.help %}
+                                                    <p class="field-help">{{ field.help }}</p>
+                                                {% endif %}
+
+                                                {% if field.options %}
+                                                    <select id="{{ field_id }}" name="{{ field.name }}" required>
+                                                        {% for value, option_label in field.options %}
+                                                            <option value="{{ value }}" {% if current_value == value %}selected{% endif %}>
+                                                                {{ option_label }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                {% else %}
+                                                    <input
+                                                        id="{{ field_id }}"
+                                                        name="{{ field.name }}"
+                                                        type="number"
+                                                        step="{{ field.step|default('any') }}"
+                                                        {% if field.min is defined %}min="{{ field.min }}"{% endif %}
+                                                        {% if field.max is defined %}max="{{ field.max }}"{% endif %}
+                                                        value="{{ current_value }}"
+                                                        placeholder="{{ field.placeholder|default('Enter value') }}"
+                                                        required
+                                                    >
+                                                {% endif %}
+
+                                                <div class="field-meta">
+                                                    <span class="field-warning"></span>
+                                                    {% if field.unit %}
+                                                        <span>{{ field.unit }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </details>
+                            </div>
+                        {% endfor %}
+
+                        {% if error %}
+                            <p class="status-error">{{ error }}</p>
+                        {% endif %}
+
+
+                    </form>
+
+                    <aside class="result-panel" aria-label="Risk Snapshot">
+                        <h3>Risk Snapshot</h3>
+                        <div class="snapshot-top">
+                            <div class="risk-chart">
+                                <canvas id="riskChart"></canvas>
+                                <div class="risk-center"><span id="riskPercent">{{ result.confidence if result else 0 }}%</span></div>
+                            </div>
+                            <div>
+                                {% set initial_dropout = result and result.label == 'Likely to Dropout' %}
+                                <span id="predictionLabel" class="prediction-label {% if initial_dropout %}dropout{% endif %}">
+                                    {% if initial_dropout %}Dropout{% else %}Non-Dropout{% endif %}
+                                </span>
+                                <div id="riskLevel" class="risk-level">{{ result.risk_level if result else 'Low' }} Risk</div>
+                                <p class="muted analysis-status" id="analysisStatus">
+                                    {% if result %}
+                                        Ready with the current model prediction.
+                                    {% else %}
+                                        Complete all required inputs to analyze risk.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="panel-divider"></div>
+                        <h3>Key Contributing Factors</h3>
+                        <ul class="snapshot-list" id="factorList">
+                            {% if result %}
+                                {% for factor in result.factors %}
+                                    <li>{{ factor }}</li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                        <h3>Suggested Actions</h3>
+                        <ul class="snapshot-list" id="actionList">
+                            {% if result %}
+                                {% for action in result.actions %}
+                                    <li>{{ action }}</li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                        <button class="primary-btn" type="button" id="analyzeBtn" style="width:100%">Analyze Risk</button>
+                    </aside>
+                </div>
+            </section>

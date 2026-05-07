@@ -1,0 +1,26 @@
+            <section id="comparison" class="content-section">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Model Comparison</p>
+                        <h2>Five Candidate Models</h2>
+                        <p class="lead">Random Forest ranked first during SMOTE plus 5-fold stratified cross-validation with the highest weighted F1 score.</p>
+                    </div>
+                    <span class="badge-best">Random Forest Best</span>
+                </div>
+                <article class="chart-card">
+                    <img class="asset-image" src="{{ url_for('dashboard.project_asset', filename='comparison-and-eval/modelcomparison.png') }}" alt="Model comparison chart from the notebook">
+                </article>
+                <div class="table-wrap" style="margin-top:18px">
+                    <div class="table-title"><h3>Summary Table</h3></div>
+                    <table>
+                        <thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td>Random Forest</td><td>0.9045</td><td>0.9053</td><td>0.9045</td><td>0.9044</td><td><span class="badge-best">Best CV F1</span></td></tr>
+                            <tr><td>KNN</td><td>0.8528</td><td>0.8547</td><td>0.8528</td><td>0.8526</td><td>Top 2</td></tr>
+                            <tr><td>Logistic Regression</td><td>0.8503</td><td>0.8531</td><td>0.8503</td><td>0.8500</td><td>Baseline</td></tr>
+                            <tr><td>Decision Tree</td><td>0.8389</td><td>0.8390</td><td>0.8389</td><td>0.8389</td><td>Tree baseline</td></tr>
+                            <tr><td>Naive Bayes</td><td>0.7975</td><td>0.8061</td><td>0.7975</td><td>0.7960</td><td>Probabilistic</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>

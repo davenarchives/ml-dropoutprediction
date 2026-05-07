@@ -9,8 +9,21 @@ GENDER_OPTIONS = [
 ]
 
 APPLICATION_ORDER_OPTIONS = [
-    (str(value), f"{value} - {'First choice' if value == 0 else 'Choice rank'}")
-    for value in range(10)
+    (str(value), label)
+    for value, label in enumerate(
+        [
+            "First choice",
+            "Second choice",
+            "Third choice",
+            "Fourth choice",
+            "Fifth choice",
+            "Sixth choice",
+            "Seventh choice",
+            "Eighth choice",
+            "Ninth choice",
+            "Last choice",
+        ]
+    )
 ]
 
 APPLICATION_MODE_OPTIONS = [
@@ -169,6 +182,15 @@ FATHER_OCCUPATION_OPTIONS = MOTHER_OCCUPATION_OPTIONS + [
     ("195", "195 - Street vendors and street service providers"),
 ]
 
+
+def without_code_prefix(options):
+    """Keep model codes as values while hiding numeric prefixes in dropdown labels."""
+    cleaned_options = []
+    for value, label in options:
+        prefix = f"{value} - "
+        cleaned_options.append((value, label.removeprefix(prefix)))
+    return cleaned_options
+
 FEATURE_FIELDS = [
     {
         "name": "Curricular units 2nd sem (approved)",
@@ -318,14 +340,14 @@ FEATURE_FIELDS = [
 ]
 
 FIELD_OPTIONS = {
-    "Application mode": APPLICATION_MODE_OPTIONS,
+    "Application mode": without_code_prefix(APPLICATION_MODE_OPTIONS),
     "Application order": APPLICATION_ORDER_OPTIONS,
-    "Course": COURSE_OPTIONS,
-    "Previous qualification": PREVIOUS_QUALIFICATION_OPTIONS,
-    "Mother's qualification": MOTHER_QUALIFICATION_OPTIONS,
-    "Father's qualification": FATHER_QUALIFICATION_OPTIONS,
-    "Mother's occupation": MOTHER_OCCUPATION_OPTIONS,
-    "Father's occupation": FATHER_OCCUPATION_OPTIONS,
+    "Course": without_code_prefix(COURSE_OPTIONS),
+    "Previous qualification": without_code_prefix(PREVIOUS_QUALIFICATION_OPTIONS),
+    "Mother's qualification": without_code_prefix(MOTHER_QUALIFICATION_OPTIONS),
+    "Father's qualification": without_code_prefix(FATHER_QUALIFICATION_OPTIONS),
+    "Mother's occupation": without_code_prefix(MOTHER_OCCUPATION_OPTIONS),
+    "Father's occupation": without_code_prefix(FATHER_OCCUPATION_OPTIONS),
     "Displaced": YES_NO_OPTIONS,
     "Debtor": YES_NO_OPTIONS,
     "Tuition fees up to date": YES_NO_OPTIONS,
@@ -411,13 +433,25 @@ TOGGLE_FIELDS = {
     "Scholarship holder",
 }
 
+SCENARIO_DEFAULTS = {
+    "Curricular units 2nd sem (approved)": 0,
+    "Curricular units 1st sem (approved)": 0,
+    "Curricular units 2nd sem (grade)": 0,
+    "Tuition fees up to date": "0",
+    "Scholarship holder": "0",
+    "Debtor": "1",
+    "Age at enrollment": 30,
+}
+
 for field in FEATURE_FIELDS:
     field["options"] = FIELD_OPTIONS.get(field["name"])
     field["section"] = FIELD_SECTIONS.get(field["name"], "Enrollment Details")
     field.update(FIELD_UI.get(field["name"], {"type": "select" if field["options"] else "number"}))
     if field["name"] in TOGGLE_FIELDS:
         field["type"] = "toggle"
-    if "default" not in field:
+    if field["name"] in SCENARIO_DEFAULTS:
+        field["default"] = SCENARIO_DEFAULTS[field["name"]]
+    elif "default" not in field:
         field["default"] = field["options"][0][0] if field["options"] else 0
 
 def default_form_values():

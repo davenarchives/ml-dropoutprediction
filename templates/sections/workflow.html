@@ -1,0 +1,21 @@
+            <section id="workflow" class="content-section">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">ML Workflow</p>
+                        <h2>Training Pipeline</h2>
+                        <p class="lead">The workflow keeps validation honest by applying SMOTE only to training data and using stratified evaluation throughout.</p>
+                    </div>
+                </div>
+                <div class="workflow">
+                    <article class="card step-card"><span class="step-icon">01</span><h3>Data Loading</h3><p>Import Kaggle dataset and inspect schema.</p></article>
+                    <article class="card step-card"><span class="step-icon">02</span><h3>Label Encoding</h3><p>Encode categorical fields and binary target.</p></article>
+                    <article class="card step-card"><span class="step-icon">03</span><h3>Stratified Split</h3><p>Use 80/20 split while preserving class balance.</p></article>
+                    <article class="card step-card"><span class="step-icon">04</span><h3>StandardScaler</h3><p>Scale numeric features for comparable magnitudes.</p></article>
+                    <article class="card step-card"><span class="step-icon">05</span><h3>SMOTE</h3><p>Balance only the training partition.</p></article>
+                    <article class="card step-card"><span class="step-icon">06</span><h3>5-Fold CV</h3><p>Run stratified cross-validation for stable scores.</p></article>
+                    <article class="card step-card"><span class="step-icon">07</span><h3>Model Comparison</h3><p>Compare five candidate classifiers.</p></article>
+                    <article class="card step-card"><span class="step-icon">08</span><h3>Hypertuning</h3><p>Search Random Forest and KNN hyperparameters.</p></article>
+                    <article class="card step-card"><span class="step-icon">09</span><h3>Evaluation</h3><p>Measure final test performance and ROC-AUC.</p></article>
+                    <article class="card step-card"><span class="step-icon">10</span><h3>Save PKL</h3><p>Persist scaler and model for app use.</p></article>
+                </div>
+            </section>

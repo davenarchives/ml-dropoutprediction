@@ -22,8 +22,9 @@
             --accent: #1D9E75;
             --accent-soft: rgba(29, 158, 117, 0.14);
             --accent-muted: #7dd8bd;
-            --support: #d0d7de;
-            --support-soft: rgba(208, 215, 222, 0.12);
+            --danger: #f85149;
+            --danger-soft: rgba(248, 81, 73, 0.16);
+            --danger-muted: #ffb4ad;
             --nav-h: 68px;
             --sidebar-w: 260px;
         }
@@ -38,8 +39,9 @@
             --muted: #57606a;
             --accent-soft: rgba(29, 158, 117, 0.12);
             --accent-muted: #096b4f;
-            --support: #57606a;
-            --support-soft: rgba(87, 96, 106, 0.1);
+            --danger: #cf222e;
+            --danger-soft: rgba(207, 34, 46, 0.12);
+            --danger-muted: #a40e26;
         }
 
         * {
@@ -96,6 +98,53 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+        }
+
+        .site-search {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            min-width: 260px;
+        }
+
+        .site-search input {
+            width: 100%;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--text);
+            padding: 0 42px 0 12px;
+            outline: none;
+        }
+
+        .site-search input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.12);
+        }
+
+        .site-search button {
+            position: absolute;
+            right: 4px;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--muted);
+        }
+
+        .site-search button:hover {
+            background: var(--card-soft);
+            color: var(--text);
+        }
+
+        .search-icon {
+            width: 18px;
+            height: 18px;
         }
 
         .brand {
@@ -313,6 +362,19 @@
 
         .content-section.active {
             display: block;
+        }
+
+        .content-section.section-search-hit {
+            outline: 2px solid rgba(29, 158, 117, 0.72);
+            outline-offset: 8px;
+        }
+
+        .search-highlight {
+            border-radius: 4px;
+            background: rgba(251, 191, 36, 0.34);
+            color: var(--text);
+            padding: 0 2px;
+            box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.28);
         }
 
         .section-head {
@@ -669,13 +731,6 @@
             display: block;
         }
 
-        #academic,
-        #personal,
-        #socioeconomic,
-        #enrollment {
-            display: none !important;
-        }
-
         details {
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -813,8 +868,8 @@
         }
 
         .prediction-label.dropout {
-            background: var(--support-soft);
-            color: var(--support);
+            background: var(--danger-soft);
+            color: var(--danger-muted);
         }
 
         .analysis-status {
@@ -947,6 +1002,11 @@
                 gap: 6px;
             }
 
+            .site-search {
+                min-width: 0;
+                width: min(42vw, 180px);
+            }
+
             .snapshot-top {
                 grid-template-columns: 1fr;
             }
@@ -966,761 +1026,29 @@
     </style>
 </head>
 <body>
-    <header class="topbar">
-        <div class="brand">
-            <button class="mobile-menu" type="button" aria-label="Open navigation" data-mobile-menu>Menu</button>
-            <span class="brand-mark" aria-hidden="true"><svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 7.5a3 3 0 0 1 5.5-1.7A3.2 3.2 0 0 1 19 8a3.4 3.4 0 0 1-.8 6.7 3.4 3.4 0 0 1-4.8 3.3A3.4 3.4 0 0 1 8 18a3.3 3.3 0 0 1-3.7-4.7A3.5 3.5 0 0 1 8 7.5Z"/><path d="M8.5 8.2v9"/><path d="M13.5 5.8v12.4"/><path d="M8.5 12h5"/><path d="M13.5 9.5H17"/><path d="M13.5 14.5H17"/></svg></span>
-            <span>AcadWatch</span>
-        </div>
-        <div class="top-actions" aria-label="Project actions">
-            <a class="repo-link" href="https://github.com/davenarchives/ml-dropoutprediction" target="_blank" rel="noreferrer" aria-label="Open GitHub repository" title="GitHub repository">
-                <ion-icon class="action-icon" name="logo-github" aria-hidden="true"></ion-icon>
-            </a>
-            <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light or dark mode" title="Toggle light or dark mode" aria-pressed="false">
-                <ion-icon class="theme-icon" data-theme-icon name="moon-outline" aria-hidden="true"></ion-icon>
-                <span class="sr-only" data-theme-label>Dark mode</span>
-            </button>
-        </div>
-    </header>
+    {% include 'components/topbar.html' %}
 
     <div class="layout">
-        <aside class="sidebar" aria-label="AcadWatch sections">
-            <p class="sidebar-label">Documentation</p>
-            <nav>
-                <ul class="nav-list">
-                    <li><button class="nav-item active" type="button" data-section-target="overview"><span class="nav-name"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>Project Overview</span></button></li>
-                    <li><button class="nav-item" type="button" data-section-target="dataset"><span class="nav-name"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Dataset Info</span></button></li>
-                    <li><button class="nav-item" type="button" data-section-target="eda"><span class="nav-name"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></svg>EDA Results</span></button></li>
-                    <li><button class="nav-item" type="button" data-section-target="workflow"><span class="nav-name"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="3" y="4" width="6" height="5" rx="1"/><rect x="15" y="4" width="6" height="5" rx="1"/><rect x="9" y="15" width="6" height="5" rx="1"/><path d="M9 6.5h6"/><path d="M12 9v6"/></svg>ML Workflow</span></button></li>
-                    <li><button class="nav-item" type="button" data-section-target="comparison"><span class="nav-name"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M5 19V9"/><path d="M12 19V5"/><path d="M19 19v-7"/><path d="M3 19h18"/></svg>Model Comparison</span></button></li>
-                    <li><button class="nav-item" type="button" data-section-target="hypertuning"><span class="nav-name"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 7h10"/><path d="M18 7h2"/><circle cx="16" cy="7" r="2"/><path d="M4 17h2"/><path d="M10 17h10"/><circle cx="8" cy="17" r="2"/></svg>Hypertuning</span></button></li>
-                    <li><button class="nav-item" type="button" data-section-target="evaluation"><span class="nav-name"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20 6 9 17l-5-5"/><path d="M14 6h6v6"/></svg>Evaluation</span></button></li>
-                </ul>
-            </nav>
-            <p class="sidebar-label">Live Demo</p>
-            <ul class="nav-list">
-                <li>
-                    <button class="nav-item" type="button" data-section-target="predictor">
-                        <span class="nav-name"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/><circle cx="12" cy="12" r="4"/><path d="m15 9 3-3"/><path d="m9 15-3 3"/></svg>Try the Predictor</span>
-                        <span class="live-pill">LIVE</span>
-                    </button>
-                </li>
-            </ul>
-        </aside>
-
+        {% include 'components/sidebar.html' %}
         <main class="main">
-            <section id="overview" class="content-section active">
-                <div class="hero-panel">
-                    <span class="pill">IT325 Machine Learning | PIT Project</span>
-                    <h1>AcadWatch</h1>
-                    <p class="lead">AcadWatch predicts student dropout risk from academic performance, tuition status, demographics, socioeconomic indicators, and enrollment records. The project trains and evaluates multiple classifiers, then uses a tuned Random Forest model to support early intervention decisions.</p>
-                    <div class="stats-grid">
-                        <article class="card"><span class="stat-value">4,424</span><span class="stat-label">Rows</span></article>
-                        <article class="card"><span class="stat-value">29</span><span class="stat-label">Features</span></article>
-                        <article class="card"><span class="stat-value">5</span><span class="stat-label">Models Tested</span></article>
-                        <article class="card"><span class="stat-value">0.8809</span><span class="stat-label">Best F1</span></article>
-                    </div>
-                </div>
-                <div class="cta-banner">
-                    <div>
-                        <h3>Try the Live Predictor</h3>
-                        <p class="muted">Enter student academic, financial, demographic, and enrollment data to generate a dropout risk assessment based on the project model workflow.</p>
-                    </div>
-                    <button class="primary-btn" type="button" data-section-target="predictor"><ion-icon class="btn-icon" name="arrow-forward-outline" aria-hidden="true"></ion-icon>Open Predictor</button>
-                </div>
-            </section>
+            {% include 'sections/overview.html' %}
 
-            <section id="dataset" class="content-section">
-                <div class="section-head">
-                    <div>
-                        <p class="eyebrow">Dataset Info</p>
-                        <h2>Student Dropout Dataset</h2>
-                        <p class="lead">Source: Kaggle student dropout dataset. This project uses 4,424 student records with 29 input features and one target column to classify Dropout versus Non-Dropout outcomes.</p>
-                    </div>
-                </div>
-                <div class="grid-two">
-                    <article class="card">
-                        <h3>Target Variable</h3>
-                        <p>Binary target: <strong>Dropout (1)</strong> vs <strong>Non-Dropout (0)</strong>.</p>
-                    </article>
-                    <article class="card">
-                        <h3>Feature Families</h3>
-                        <p>Inputs include academic performance, financial status, family background, course enrollment, and demographic context.</p>
-                    </article>
-                </div>
-                <div class="grid-two" style="margin-top:18px">
-                    <article class="card">
-                        <h3>Dataset File</h3>
-                        <p><a href="{{ url_for('dashboard.project_asset', filename='files/dropout_dataset.csv') }}">dropout_dataset.csv</a></p>
-                    </article>
-                    <article class="card">
-                        <h3>Notebook</h3>
-                        <p><a href="{{ url_for('dashboard.project_asset', filename='files/StudentDropoutRisk.ipynb') }}">StudentDropoutRisk.ipynb</a></p>
-                    </article>
-                </div>
-                <div class="table-wrap" style="margin-top:18px">
-                    <div class="table-title"><h3>Feature Category Breakdown</h3></div>
-                    <table>
-                        <thead><tr><th>Category</th><th>Example Features</th><th>Role</th></tr></thead>
-                        <tbody>
-                            <tr><td>Academic</td><td>Units approved, grades, evaluations, admission grade</td><td>Performance and progress signals</td></tr>
-                            <tr><td>Demographic</td><td>Age, gender, nationality, marital status</td><td>Student background context</td></tr>
-                            <tr><td>Socioeconomic</td><td>Tuition status, scholarship, debtor, parents occupation</td><td>Financial and household support signals</td></tr>
-                            <tr><td>Enrollment</td><td>Course, application mode, attendance schedule, displacement</td><td>Program and access context</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="table-wrap" style="margin-top:18px">
-                    <div class="table-title"><h3>Sample Data</h3></div>
-                    <table>
-                        <thead><tr><th>Course</th><th>Age</th><th>Tuition Up To Date</th><th>2nd Sem Approved</th><th>2nd Sem Grade</th><th>Target</th></tr></thead>
-                        <tbody>
-                            <tr><td>171</td><td>20</td><td>Yes</td><td>0</td><td>0.00</td><td>Dropout</td></tr>
-                            <tr><td>9254</td><td>19</td><td>No</td><td>6</td><td>13.67</td><td>Non-Dropout</td></tr>
-                            <tr><td>9070</td><td>19</td><td>No</td><td>0</td><td>0.00</td><td>Dropout</td></tr>
-                            <tr><td>9773</td><td>20</td><td>Yes</td><td>5</td><td>12.40</td><td>Non-Dropout</td></tr>
-                            <tr><td>8014</td><td>45</td><td>Yes</td><td>6</td><td>13.00</td><td>Non-Dropout</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+            {% include 'sections/dataset.html' %}
 
-            <section id="eda" class="content-section">
-                <div class="section-head">
-                    <div>
-                        <p class="eyebrow">EDA Results</p>
-                        <h2>Exploratory Findings</h2>
-                        <p class="lead">The class mix and feature rankings help explain why financial status and academic progress deserve prominent treatment in the risk demo.</p>
-                    </div>
-                </div>
-                <div class="asset-grid">
-                    <article class="chart-card">
-                        <h3>Target Variable Distribution</h3>
-                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/targetvariabledistribution.png') }}" alt="Target variable distribution chart">
-                        <p>The dataset is imbalanced: 3,003 Non-Dropout records and 1,421 Dropout records.</p>
-                    </article>
-                    <article class="chart-card">
-                        <h3>Top 10 Features</h3>
-                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/top10features.png') }}" alt="Top 10 feature importance chart">
-                        <p>Academic progress, tuition status, and financial signals are the most useful model inputs.</p>
-                    </article>
-                    <article class="chart-card">
-                        <h3>Distribution by Target</h3>
-                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/distributionbytarget.png') }}" alt="Distribution by target EDA chart">
-                    </article>
-                    <article class="chart-card">
-                        <h3>Financial Factors by Target</h3>
-                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/financialfactorsbytarget.png') }}" alt="Financial factors by target chart">
-                    </article>
-                    <article class="chart-card">
-                        <h3>Demographic Factors</h3>
-                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='eda/demographicfactors.png') }}" alt="Demographic factors chart">
-                    </article>
-                </div>
-            </section>
+            {% include 'sections/eda.html' %}
 
-            <section id="workflow" class="content-section">
-                <div class="section-head">
-                    <div>
-                        <p class="eyebrow">ML Workflow</p>
-                        <h2>Training Pipeline</h2>
-                        <p class="lead">The workflow keeps validation honest by applying SMOTE only to training data and using stratified evaluation throughout.</p>
-                    </div>
-                </div>
-                <div class="workflow">
-                    <article class="card step-card"><span class="step-icon">01</span><h3>Data Loading</h3><p>Import Kaggle dataset and inspect schema.</p></article>
-                    <article class="card step-card"><span class="step-icon">02</span><h3>Label Encoding</h3><p>Encode categorical fields and binary target.</p></article>
-                    <article class="card step-card"><span class="step-icon">03</span><h3>Stratified Split</h3><p>Use 80/20 split while preserving class balance.</p></article>
-                    <article class="card step-card"><span class="step-icon">04</span><h3>StandardScaler</h3><p>Scale numeric features for comparable magnitudes.</p></article>
-                    <article class="card step-card"><span class="step-icon">05</span><h3>SMOTE</h3><p>Balance only the training partition.</p></article>
-                    <article class="card step-card"><span class="step-icon">06</span><h3>5-Fold CV</h3><p>Run stratified cross-validation for stable scores.</p></article>
-                    <article class="card step-card"><span class="step-icon">07</span><h3>Model Comparison</h3><p>Compare five candidate classifiers.</p></article>
-                    <article class="card step-card"><span class="step-icon">08</span><h3>Hypertuning</h3><p>Search Random Forest and KNN hyperparameters.</p></article>
-                    <article class="card step-card"><span class="step-icon">09</span><h3>Evaluation</h3><p>Measure final test performance and ROC-AUC.</p></article>
-                    <article class="card step-card"><span class="step-icon">10</span><h3>Save PKL</h3><p>Persist scaler and model for app use.</p></article>
-                </div>
-            </section>
+            {% include 'sections/workflow.html' %}
 
-            <section id="comparison" class="content-section">
-                <div class="section-head">
-                    <div>
-                        <p class="eyebrow">Model Comparison</p>
-                        <h2>Five Candidate Models</h2>
-                        <p class="lead">Random Forest ranked first during SMOTE plus 5-fold stratified cross-validation with the highest weighted F1 score.</p>
-                    </div>
-                    <span class="badge-best">Random Forest Best</span>
-                </div>
-                <article class="chart-card">
-                    <img class="asset-image" src="{{ url_for('dashboard.project_asset', filename='comparison-and-eval/modelcomparison.png') }}" alt="Model comparison chart from the notebook">
-                </article>
-                <div class="table-wrap" style="margin-top:18px">
-                    <div class="table-title"><h3>Summary Table</h3></div>
-                    <table>
-                        <thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>Random Forest</td><td>0.9045</td><td>0.9053</td><td>0.9045</td><td>0.9044</td><td><span class="badge-best">Best CV F1</span></td></tr>
-                            <tr><td>KNN</td><td>0.8528</td><td>0.8547</td><td>0.8528</td><td>0.8526</td><td>Top 2</td></tr>
-                            <tr><td>Logistic Regression</td><td>0.8503</td><td>0.8531</td><td>0.8503</td><td>0.8500</td><td>Baseline</td></tr>
-                            <tr><td>Decision Tree</td><td>0.8389</td><td>0.8390</td><td>0.8389</td><td>0.8389</td><td>Tree baseline</td></tr>
-                            <tr><td>Naive Bayes</td><td>0.7975</td><td>0.8061</td><td>0.7975</td><td>0.7960</td><td>Probabilistic</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+            {% include 'sections/comparison.html' %}
 
-            <section id="hypertuning" class="content-section">
-                <div class="section-head">
-                    <div>
-                        <p class="eyebrow">Hypertuning</p>
-                        <h2>RandomizedSearchCV</h2>
-                        <p class="lead">The notebook hypertunes the top two cross-validation models: Random Forest and KNN. RandomizedSearchCV runs 20 candidates with 5-fold stratified CV, scored by weighted recall.</p>
-                    </div>
-                </div>
-                <div class="grid-two">
-                    <div class="table-wrap">
-                        <div class="table-title"><h3>Random Forest Best Parameters</h3></div>
-                        <table>
-                            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
-                            <tbody>
-                                <tr><td>n_estimators</td><td>200</td></tr>
-                                <tr><td>max_depth</td><td>30</td></tr>
-                                <tr><td>min_samples_split</td><td>2</td></tr>
-                                <tr><td>min_samples_leaf</td><td>1</td></tr>
-                                <tr><td>max_features</td><td>log2</td></tr>
-                                <tr><td>Best CV Recall</td><td>0.9057</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="table-wrap">
-                        <div class="table-title"><h3>KNN Best Parameters</h3></div>
-                        <table>
-                            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
-                            <tbody>
-                                <tr><td>n_neighbors</td><td>3</td></tr>
-                                <tr><td>weights</td><td>distance</td></tr>
-                                <tr><td>metric</td><td>minkowski</td></tr>
-                                <tr><td>p</td><td>1</td></tr>
-                                <tr><td>Best CV Recall</td><td>0.8990</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="table-wrap span-two">
-                        <div class="table-title"><h3>Before vs After</h3></div>
-                        <table>
-                            <thead><tr><th>Model</th><th>Before CV F1</th><th>After Test F1</th><th>Before CV Recall</th><th>After Test Recall</th></tr></thead>
-                            <tbody>
-                                <tr><td>Random Forest</td><td>0.9044</td><td>0.8809</td><td>0.9045</td><td>0.8825</td></tr>
-                                <tr><td>KNN</td><td>0.8526</td><td>0.8243</td><td>0.8528</td><td>0.8249</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+            {% include 'sections/hypertuning.html' %}
 
-            <section id="evaluation" class="content-section">
-                <div class="section-head">
-                    <div>
-                        <p class="eyebrow">Evaluation</p>
-                        <h2>Final Model Performance</h2>
-                        <p class="lead">Evaluation combines summary metrics, confusion matrix behavior, classification report detail, and ROC curve shape.</p>
-                    </div>
-                </div>
-                <div class="metric-grid">
-                    <article class="card"><span class="stat-value">0.8825</span><span class="stat-label">Accuracy</span></article>
-                    <article class="card"><span class="stat-value">0.8811</span><span class="stat-label">Precision</span></article>
-                    <article class="card"><span class="stat-value">0.8825</span><span class="stat-label">Recall</span></article>
-                    <article class="card"><span class="stat-value">0.8809</span><span class="stat-label">F1</span></article>
-                </div>
-                <div class="grid-two" style="margin-top:18px">
-                    <article class="chart-card">
-                        <h3>Confusion Matrix</h3>
-                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='comparison-and-eval/confusionmatrix.png') }}" alt="Random Forest confusion matrix">
-                    </article>
-                    <article class="chart-card">
-                        <h3>ROC Curve</h3>
-                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='comparison-and-eval/roccurve.png') }}" alt="Random Forest ROC curve">
-                    </article>
-                </div>
-                <div class="table-wrap" style="margin-top:18px">
-                    <div class="table-title"><h3>Classification Report</h3></div>
-                    <table>
-                        <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
-                        <tbody>
-                            <tr><td>Non-Dropout</td><td>0.90</td><td>0.94</td><td>0.92</td><td>601</td></tr>
-                            <tr><td>Dropout</td><td>0.85</td><td>0.77</td><td>0.81</td><td>284</td></tr>
-                            <tr><td>Weighted Avg</td><td>0.88</td><td>0.88</td><td>0.88</td><td>885</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+            {% include 'sections/evaluation.html' %}
 
-            <section id="predictor" class="content-section">
-                <div class="predictor-hero">
-                    <h2 class="predictor-title">Student Dropout <em>Risk Predictor</em></h2>
-                    <p class="lead">Enter the 29 dataset features described in the project schema to generate a dropout risk assessment informed by the tuned Random Forest classifier trained on 4,424 student records.</p>
-                </div>
-                <div class="predictor-grid">
-                    <form class="predictor-shell" id="predictorForm" data-api-url="{{ url_for('dashboard.predict_api') }}">
-                        <div class="tabs" role="tablist" aria-label="Predictor input categories">
-                            {% for section in sections %}
-                                {% set tab_id = section.title|lower|replace(' ', '-') %}
-                                <button class="tab-btn {% if loop.first %}active{% endif %}" type="button" data-tab-target="{{ tab_id }}">
-                                    {{ section.title }}
-                                </button>
-                            {% endfor %}
-                        </div>
-
-                        {% for section in sections %}
-                            {% set tab_id = section.title|lower|replace(' ', '-') %}
-                            <div class="accordion {% if loop.first %}active{% endif %}" id="{{ tab_id }}">
-                                <details open>
-                                    <summary>{{ section.title }} <ion-icon name="chevron-down-outline" aria-hidden="true"></ion-icon></summary>
-                                    <div class="fields-grid">
-                                        {% for field in section.fields %}
-                                            {% set field_id = "feature_" ~ loop.index ~ "_" ~ tab_id %}
-                                            {% set current_value = form_values.get(field.name, field.default|string) %}
-                                            <div class="field" data-field-card>
-                                                <label for="{{ field_id }}">{{ field.label }}</label>
-                                                {% if field.help %}
-                                                    <p class="field-help">{{ field.help }}</p>
-                                                {% endif %}
-
-                                                {% if field.options %}
-                                                    <select id="{{ field_id }}" name="{{ field.name }}" required>
-                                                        {% for value, option_label in field.options %}
-                                                            <option value="{{ value }}" {% if current_value == value %}selected{% endif %}>
-                                                                {{ option_label }}
-                                                            </option>
-                                                        {% endfor %}
-                                                    </select>
-                                                {% else %}
-                                                    <input
-                                                        id="{{ field_id }}"
-                                                        name="{{ field.name }}"
-                                                        type="number"
-                                                        step="{{ field.step|default('any') }}"
-                                                        {% if field.min is defined %}min="{{ field.min }}"{% endif %}
-                                                        {% if field.max is defined %}max="{{ field.max }}"{% endif %}
-                                                        value="{{ current_value }}"
-                                                        placeholder="{{ field.placeholder|default('Enter value') }}"
-                                                        required
-                                                    >
-                                                {% endif %}
-
-                                                <div class="field-meta">
-                                                    <span class="field-warning"></span>
-                                                    {% if field.unit %}
-                                                        <span>{{ field.unit }}</span>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </details>
-                            </div>
-                        {% endfor %}
-
-                        {% if error %}
-                            <p class="status-error">{{ error }}</p>
-                        {% endif %}
-
-                        <fieldset class="legacy-predictor-fields" disabled hidden>
-                        <div class="accordion active" id="academic">
-                            <details open>
-                                <summary>Academic Performance <span>⌄</span></summary>
-                                <div class="fields-grid">
-                                    <div class="field"><label for="units2">2nd Sem Units Approved</label><input id="units2" name="units2" type="number" min="0" max="12" value="5"></div>
-                                    <div class="field"><label for="grade2">2nd Sem Grade</label><input id="grade2" name="grade2" type="number" min="0" max="20" step="0.1" value="12.5"></div>
-                                    <div class="field"><label for="units1">1st Sem Units Approved</label><input id="units1" name="units1" type="number" min="0" max="12" value="5"></div>
-                                    <div class="field"><label for="admission">Admission Grade</label><input id="admission" name="admission" type="number" min="0" max="200" value="130"></div>
-                                    <div class="field"><label for="evals2">2nd Sem Evaluations</label><input id="evals2" name="evals2" type="number" min="0" max="30" value="8"></div>
-                                    <div class="field"><label for="enrolled2">2nd Sem Enrolled Units</label><input id="enrolled2" name="enrolled2" type="number" min="1" max="12" value="6"></div>
-                                    <div class="field"><label for="noEval">Units Without Evaluations</label><input id="noEval" name="noEval" type="number" min="0" max="12" value="0"></div>
-                                </div>
-                            </details>
-                        </div>
-
-                        <div class="accordion" id="personal">
-                            <details open>
-                                <summary>Personal Information <span>⌄</span></summary>
-                                <div class="fields-grid">
-                                    <div class="field"><label for="age">Age</label><input id="age" name="age" type="number" min="16" max="70" value="20"></div>
-                                    <div class="field"><label for="gender">Gender</label><select id="gender" name="gender"><option value="0">Female</option><option value="1">Male</option></select></div>
-                                    <div class="field"><label for="marital">Marital Status</label><select id="marital" name="marital"><option value="single">Single</option><option value="married">Married</option><option value="other">Other</option></select></div>
-                                    <div class="field"><label for="nationality">Nationality</label><select id="nationality" name="nationality"><option value="local">Local</option><option value="international">International</option></select></div>
-                                </div>
-                            </details>
-                        </div>
-
-                        <div class="accordion" id="socioeconomic">
-                            <details open>
-                                <summary>Socioeconomic Factors <span>⌄</span></summary>
-                                <div class="fields-grid">
-                                    <div class="field"><label for="tuition">Tuition Fees Up To Date</label><select id="tuition" name="tuition"><option value="1">Yes</option><option value="0">No</option></select></div>
-                                    <div class="field"><label for="scholarship">Scholarship Holder</label><select id="scholarship" name="scholarship"><option value="0">No</option><option value="1">Yes</option></select></div>
-                                    <div class="field"><label for="debtor">Debtor</label><select id="debtor" name="debtor"><option value="0">No</option><option value="1">Yes</option></select></div>
-                                    <div class="field"><label for="motherOcc">Mother Occupation</label><select id="motherOcc" name="motherOcc"><option value="professional">Professional</option><option value="service">Service worker</option><option value="unskilled">Unskilled worker</option></select></div>
-                                    <div class="field"><label for="fatherOcc">Father Occupation</label><select id="fatherOcc" name="fatherOcc"><option value="professional">Professional</option><option value="service">Service worker</option><option value="unskilled">Unskilled worker</option></select></div>
-                                    <div class="field"><label for="parentQual">Parents Qualification</label><select id="parentQual" name="parentQual"><option value="higher">Higher education</option><option value="secondary">Secondary</option><option value="basic">Basic education</option></select></div>
-                                </div>
-                            </details>
-                        </div>
-
-                        <div class="accordion" id="enrollment">
-                            <details open>
-                                <summary>Enrollment Details <span>⌄</span></summary>
-                                <div class="fields-grid">
-                                    <div class="field"><label for="course">Course</label><select id="course" name="course"><option value="informatics">Informatics Engineering</option><option value="management">Management</option><option value="tourism">Tourism</option><option value="nursing">Nursing</option><option value="education">Basic Education</option></select></div>
-                                    <div class="field"><label for="application">Application Mode</label><select id="application" name="application"><option value="regular">General contingent</option><option value="transfer">Transfer</option><option value="over23">Over 23 years old</option><option value="international">International student</option></select></div>
-                                    <div class="field"><label for="schedule">Daytime / Evening</label><select id="schedule" name="schedule"><option value="daytime">Daytime</option><option value="evening">Evening</option></select></div>
-                                    <div class="field"><label for="displaced">Displaced</label><select id="displaced" name="displaced"><option value="0">No</option><option value="1">Yes</option></select></div>
-                                    <div class="field"><label for="international">International</label><select id="international" name="international"><option value="0">No</option><option value="1">Yes</option></select></div>
-                                </div>
-                            </details>
-                        </div>
-                        </fieldset>
-                    </form>
-
-                    <aside class="result-panel" aria-label="Risk Snapshot">
-                        <h3>Risk Snapshot</h3>
-                        <div class="snapshot-top">
-                            <div class="risk-chart">
-                                <canvas id="riskChart"></canvas>
-                                <div class="risk-center"><span id="riskPercent">{{ result.confidence if result else 0 }}%</span></div>
-                            </div>
-                            <div>
-                                {% set initial_dropout = result and result.label == 'Likely to Dropout' %}
-                                <span id="predictionLabel" class="prediction-label {% if initial_dropout %}dropout{% endif %}">
-                                    {% if initial_dropout %}Dropout{% else %}Non-Dropout{% endif %}
-                                </span>
-                                <div id="riskLevel" class="risk-level">{{ result.risk_level if result else 'Low' }} Risk</div>
-                                <p class="muted analysis-status" id="analysisStatus">
-                                    {% if result %}
-                                        Ready with the current model prediction.
-                                    {% else %}
-                                        Complete all required inputs to analyze risk.
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="panel-divider"></div>
-                        <h3>Key Contributing Factors</h3>
-                        <ul class="snapshot-list" id="factorList">
-                            {% if result %}
-                                {% for factor in result.factors %}
-                                    <li>{{ factor }}</li>
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
-                        <h3>Suggested Actions</h3>
-                        <ul class="snapshot-list" id="actionList">
-                            {% if result %}
-                                {% for action in result.actions %}
-                                    <li>{{ action }}</li>
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
-                        <button class="primary-btn" type="button" id="analyzeBtn" style="width:100%">Analyze Risk</button>
-                    </aside>
-                </div>
-            </section>
+            {% include 'sections/predictor.html' %}
         </main>
     </div>
 
-    <script>
-        const chartTextColor = '#c9d1d9';
-        const gridColor = 'rgba(48, 54, 61, 0.82)';
-        const accent = '#1D9E75';
-        const neutralStrong = '#d0d7de';
-        const neutralSoft = 'rgba(139, 148, 158, 0.34)';
-        const charts = {};
-        const initialResult = {{ result|tojson }};
-        let lastRisk = Number(initialResult?.confidence || 0);
-
-        function applyTheme(theme) {
-            const isLight = theme === 'light';
-            document.body.classList.toggle('light-theme', isLight);
-            document.querySelector('[data-theme-label]').textContent = isLight ? 'Light mode' : 'Dark mode';
-            document.querySelector('[data-theme-toggle]').setAttribute('aria-pressed', String(isLight));
-            document.querySelector('[data-theme-icon]').setAttribute('name', isLight ? 'sunny-outline' : 'moon-outline');
-            updateRiskChartColors();
-        }
-
-        function riskChartPalette(risk) {
-            const isLight = document.body.classList.contains('light-theme');
-            return {
-                risk: risk >= 50 ? (isLight ? '#57606a' : neutralStrong) : accent,
-                remaining: isLight ? '#d8dee4' : 'rgba(48, 54, 61, 0.72)',
-                border: isLight ? '#ffffff' : '#161b22',
-            };
-        }
-
-        function updateRiskChartColors() {
-            if (!charts.riskChart) return;
-            const palette = riskChartPalette(lastRisk);
-            charts.riskChart.data.datasets[0].backgroundColor = [palette.risk, palette.remaining];
-            charts.riskChart.data.datasets[0].borderColor = palette.border;
-            charts.riskChart.update();
-        }
-
-        const savedTheme = localStorage.getItem('acadwatch-theme') || 'dark';
-        applyTheme(savedTheme);
-
-        Chart.defaults.color = chartTextColor;
-        Chart.defaults.font.family = 'Inter, sans-serif';
-        Chart.defaults.borderColor = gridColor;
-
-        function getValue(id) {
-            const field = document.getElementById(id);
-            if (!field) return 0;
-            const value = Number(field.value);
-            return Number.isFinite(value) ? value : 0;
-        }
-
-        function getText(id) {
-            const field = document.getElementById(id);
-            return field ? field.value : '';
-        }
-
-        function clamp(value, min, max) {
-            return Math.min(max, Math.max(min, value));
-        }
-
-        function switchSection(sectionId) {
-            document.querySelectorAll('.content-section').forEach((section) => {
-                section.classList.toggle('active', section.id === sectionId);
-            });
-            document.querySelectorAll('[data-section-target]').forEach((item) => {
-                item.classList.toggle('active', item.dataset.sectionTarget === sectionId);
-            });
-            document.body.classList.remove('sidebar-open');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            requestAnimationFrame(() => initializeVisibleCharts(sectionId));
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach((button) => {
-                button.classList.toggle('active', button.dataset.tabTarget === tabId);
-            });
-            document.querySelectorAll('.accordion').forEach((panel) => {
-                panel.classList.toggle('active', panel.id === tabId);
-            });
-        }
-
-        function initializeVisibleCharts(sectionId) {
-            if (sectionId === 'predictor') initRiskChart();
-        }
-
-        function initRiskChart() {
-            if (charts.riskChart) return;
-            const startingRisk = Math.max(0, Math.min(100, Number(initialResult?.confidence || 0)));
-            charts.riskChart = new Chart(document.getElementById('riskChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Risk', 'Remaining'],
-                    datasets: [{
-                        data: [startingRisk, 100 - startingRisk],
-                        backgroundColor: [accent, 'rgba(48, 54, 61, 0.72)'],
-                        borderColor: '#161b22',
-                        borderWidth: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '74%',
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
-                }
-            });
-            if (initialResult) {
-                renderModelResult(initialResult, 'Ready with the current model prediction.');
-            }
-        }
-
-        function renderList(id, items) {
-            const list = document.getElementById(id);
-            list.innerHTML = '';
-            items.forEach((item) => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                list.appendChild(li);
-            });
-        }
-
-        function renderModelResult(result, statusText) {
-            const risk = Math.max(0, Math.min(100, Number(result.confidence || 0)));
-            const label = result.label === 'Likely to Dropout' ? 'Dropout' : 'Non-Dropout';
-            lastRisk = risk;
-
-            if (charts.riskChart) {
-                const palette = riskChartPalette(risk);
-                charts.riskChart.data.datasets[0].data = [risk, 100 - risk];
-                charts.riskChart.data.datasets[0].backgroundColor = [palette.risk, palette.remaining];
-                charts.riskChart.data.datasets[0].borderColor = palette.border;
-                charts.riskChart.update();
-            }
-
-            document.getElementById('riskPercent').textContent = `${risk.toFixed(1).replace('.0', '')}%`;
-            document.getElementById('riskLevel').textContent = `${result.risk_level} Risk`;
-            const status = document.getElementById('analysisStatus');
-            status.textContent = statusText || `Analyzed current inputs with the trained model. Dropout probability is ${risk.toFixed(1).replace('.0', '')}%.`;
-            status.classList.remove('pending');
-
-            const predictionLabel = document.getElementById('predictionLabel');
-            predictionLabel.textContent = label;
-            predictionLabel.classList.toggle('dropout', label === 'Dropout');
-            renderList('factorList', result.factors || []);
-            renderList('actionList', result.actions || []);
-        }
-
-        async function requestPrediction() {
-            const form = document.getElementById('predictorForm');
-            const response = await fetch(form.dataset.apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || 'Prediction failed');
-            }
-            return data;
-        }
-
-        function markRiskPending() {
-            const status = document.getElementById('analysisStatus');
-            const button = document.getElementById('analyzeBtn');
-            status.textContent = 'Inputs changed. Click Analyze Risk to refresh the snapshot.';
-            status.classList.add('pending');
-            button.textContent = 'Analyze Updated Inputs';
-        }
-
-        async function analyzeRisk() {
-            const button = document.getElementById('analyzeBtn');
-            button.textContent = 'Analyzing...';
-            button.disabled = true;
-            try {
-                const result = await requestPrediction();
-                renderModelResult(result);
-            } catch (error) {
-                const status = document.getElementById('analysisStatus');
-                status.textContent = error.message;
-                status.classList.add('pending');
-            } finally {
-                button.disabled = false;
-                button.textContent = 'Analyze Risk';
-            }
-        }
-
-        function calculateRisk() {
-            initRiskChart();
-            const units2 = getValue('units2');
-            const grade2 = getValue('grade2');
-            const units1 = getValue('units1');
-            const admission = getValue('admission');
-            const evals2 = getValue('evals2');
-            const enrolled2 = Math.max(1, getValue('enrolled2'));
-            const noEval = getValue('noEval');
-            const age = getValue('age');
-            const tuitionPaid = getText('tuition') === '1';
-            const debtor = getText('debtor') === '1';
-            const scholarship = getText('scholarship') === '1';
-            const displaced = getText('displaced') === '1';
-            const international = getText('international') === '1' || getText('nationality') === 'international';
-            const schedule = getText('schedule');
-            const application = getText('application');
-            const parentQual = getText('parentQual');
-
-            let risk = 24;
-            const approvalRatio = units2 / enrolled2;
-            risk += (1 - clamp(approvalRatio, 0, 1)) * 26;
-            risk += (1 - clamp(units1 / 6, 0, 1)) * 10;
-            risk += (1 - clamp(grade2 / 20, 0, 1)) * 14;
-            risk += tuitionPaid ? -18 : 22;
-            risk += debtor ? 18 : -5;
-            risk += scholarship ? -8 : 4;
-            risk += noEval * 2.8;
-            risk += evals2 < 3 ? 6 : 0;
-            risk += admission < 110 ? 7 : admission > 150 ? -5 : 0;
-            risk += age > 28 ? 5 : age < 22 ? -2 : 0;
-            risk += displaced ? 4 : 0;
-            risk += international ? 4 : 0;
-            risk += schedule === 'evening' ? 3 : 0;
-            risk += application === 'over23' || application === 'transfer' ? 4 : 0;
-            risk += parentQual === 'basic' ? 4 : 0;
-            risk = Math.round(clamp(risk, 4, 96));
-            lastRisk = risk;
-
-            const palette = riskChartPalette(risk);
-            const label = risk >= 50 ? 'Dropout' : 'Non-Dropout';
-            const level = risk >= 65 ? 'High Risk' : risk >= 38 ? 'Medium Risk' : 'Low Risk';
-
-            charts.riskChart.data.datasets[0].data = [risk, 100 - risk];
-            charts.riskChart.data.datasets[0].backgroundColor = [palette.risk, palette.remaining];
-            charts.riskChart.data.datasets[0].borderColor = palette.border;
-            charts.riskChart.update();
-
-            document.getElementById('riskPercent').textContent = `${risk}%`;
-            document.getElementById('riskLevel').textContent = level;
-            const status = document.getElementById('analysisStatus');
-            status.textContent = `Analyzed current inputs. Simulated dropout probability is ${risk}%.`;
-            status.classList.remove('pending');
-            const predictionLabel = document.getElementById('predictionLabel');
-            predictionLabel.textContent = label;
-            predictionLabel.classList.toggle('dropout', label === 'Dropout');
-
-            const factors = [];
-            if (!tuitionPaid) factors.push('Tuition fees are not up to date.');
-            if (debtor) factors.push('Debtor status is active.');
-            if (approvalRatio < 0.55) factors.push('Low second-semester unit approval rate.');
-            if (grade2 < 10) factors.push('Second-semester grade is below passing range.');
-            if (noEval >= 2) factors.push('Multiple units have no evaluation record.');
-            if (!scholarship) factors.push('No scholarship support is recorded.');
-            if (factors.length === 0) factors.push('Academic and financial indicators are currently stable.');
-
-            const actions = risk >= 65
-                ? ['Schedule an adviser check-in this week.', 'Review tuition or debt support options.', 'Create a recovery plan for failed or unevaluated units.']
-                : risk >= 38
-                    ? ['Monitor academic progress after the next evaluation.', 'Offer tutoring or study support resources.', 'Confirm financial aid eligibility.']
-                    : ['Continue regular check-ins.', 'Encourage sustained course engagement.', 'Keep support resources visible.'];
-
-            renderList('factorList', factors);
-            renderList('actionList', actions);
-        }
-
-        function renderList(id, items) {
-            const list = document.getElementById(id);
-            list.innerHTML = '';
-            items.forEach((item) => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                list.appendChild(li);
-            });
-        }
-
-        document.querySelectorAll('[data-section-target]').forEach((item) => {
-            item.addEventListener('click', () => switchSection(item.dataset.sectionTarget));
-        });
-
-        document.querySelectorAll('[data-tab-target]').forEach((button) => {
-            button.addEventListener('click', () => switchTab(button.dataset.tabTarget));
-        });
-
-        document.querySelector('[data-mobile-menu]').addEventListener('click', () => {
-            document.body.classList.toggle('sidebar-open');
-        });
-
-        document.querySelector('[data-theme-toggle]').addEventListener('click', () => {
-            const nextTheme = document.body.classList.contains('light-theme') ? 'dark' : 'light';
-            localStorage.setItem('acadwatch-theme', nextTheme);
-            applyTheme(nextTheme);
-        });
-
-        document.getElementById('predictorForm').addEventListener('input', markRiskPending);
-        document.getElementById('predictorForm').addEventListener('change', markRiskPending);
-        document.getElementById('analyzeBtn').addEventListener('click', analyzeRisk);
-
-        initializeVisibleCharts('overview');
-    </script>
+    {% include 'components/dashboard_scripts.html' %}
 </body>
 </html>

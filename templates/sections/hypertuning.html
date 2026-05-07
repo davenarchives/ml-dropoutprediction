@@ -1,0 +1,48 @@
+            <section id="hypertuning" class="content-section">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Hypertuning</p>
+                        <h2>RandomizedSearchCV</h2>
+                        <p class="lead">The notebook hypertunes the top two cross-validation models: Random Forest and KNN. RandomizedSearchCV runs 20 candidates with 5-fold stratified CV, scored by weighted recall.</p>
+                    </div>
+                </div>
+                <div class="grid-two">
+                    <div class="table-wrap">
+                        <div class="table-title"><h3>Random Forest Best Parameters</h3></div>
+                        <table>
+                            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+                            <tbody>
+                                <tr><td>n_estimators</td><td>200</td></tr>
+                                <tr><td>max_depth</td><td>30</td></tr>
+                                <tr><td>min_samples_split</td><td>2</td></tr>
+                                <tr><td>min_samples_leaf</td><td>1</td></tr>
+                                <tr><td>max_features</td><td>log2</td></tr>
+                                <tr><td>Best CV Recall</td><td>0.9057</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-wrap">
+                        <div class="table-title"><h3>KNN Best Parameters</h3></div>
+                        <table>
+                            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+                            <tbody>
+                                <tr><td>n_neighbors</td><td>3</td></tr>
+                                <tr><td>weights</td><td>distance</td></tr>
+                                <tr><td>metric</td><td>minkowski</td></tr>
+                                <tr><td>p</td><td>1</td></tr>
+                                <tr><td>Best CV Recall</td><td>0.8990</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-wrap span-two">
+                        <div class="table-title"><h3>Before vs After</h3></div>
+                        <table>
+                            <thead><tr><th>Model</th><th>Before CV F1</th><th>After Test F1</th><th>Before CV Recall</th><th>After Test Recall</th></tr></thead>
+                            <tbody>
+                                <tr><td>Random Forest</td><td>0.9044</td><td>0.8809</td><td>0.9045</td><td>0.8825</td></tr>
+                                <tr><td>KNN</td><td>0.8526</td><td>0.8243</td><td>0.8528</td><td>0.8249</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>

@@ -1,0 +1,285 @@
+    <script>
+        const chartTextColor = '#c9d1d9';
+        const gridColor = 'rgba(48, 54, 61, 0.82)';
+        const accent = '#1D9E75';
+        const danger = '#f85149';
+        const dangerLight = '#cf222e';
+        const charts = {};
+        const initialResult = {{ result|tojson }};
+        let lastRisk = Number(initialResult?.confidence || 0);
+
+        function applyTheme(theme) {
+            const isLight = theme === 'light';
+            document.body.classList.toggle('light-theme', isLight);
+            document.querySelector('[data-theme-label]').textContent = isLight ? 'Light mode' : 'Dark mode';
+            document.querySelector('[data-theme-toggle]').setAttribute('aria-pressed', String(isLight));
+            document.querySelector('[data-theme-icon]').setAttribute('name', isLight ? 'sunny-outline' : 'moon-outline');
+            updateRiskChartColors();
+        }
+
+        function riskChartPalette(risk) {
+            const isLight = document.body.classList.contains('light-theme');
+            return {
+                risk: risk >= 50 ? (isLight ? dangerLight : danger) : accent,
+                remaining: isLight ? '#d8dee4' : 'rgba(48, 54, 61, 0.72)',
+                border: isLight ? '#ffffff' : '#161b22',
+            };
+        }
+
+        function updateRiskChartColors() {
+            if (!charts.riskChart) return;
+            const palette = riskChartPalette(lastRisk);
+            charts.riskChart.data.datasets[0].backgroundColor = [palette.risk, palette.remaining];
+            charts.riskChart.data.datasets[0].borderColor = palette.border;
+            charts.riskChart.update();
+        }
+
+        const savedTheme = localStorage.getItem('acadwatch-theme') || 'dark';
+        applyTheme(savedTheme);
+
+        Chart.defaults.color = chartTextColor;
+        Chart.defaults.font.family = 'Inter, sans-serif';
+        Chart.defaults.borderColor = gridColor;
+
+        function switchSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach((section) => {
+                section.classList.toggle('active', section.id === sectionId);
+            });
+            document.querySelectorAll('[data-section-target]').forEach((item) => {
+                item.classList.toggle('active', item.dataset.sectionTarget === sectionId);
+            });
+            document.body.classList.remove('sidebar-open');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            requestAnimationFrame(() => initializeVisibleCharts(sectionId));
+        }
+
+        function searchSections(query) {
+            const term = query.trim().toLowerCase();
+            if (!term) return null;
+
+            return [...document.querySelectorAll('.content-section')]
+                .find((section) => section.innerText.toLowerCase().includes(term));
+        }
+
+        function clearSearchHighlights() {
+            document.querySelectorAll('mark.search-highlight').forEach((mark) => {
+                mark.replaceWith(document.createTextNode(mark.textContent));
+            });
+        }
+
+        function escapeRegExp(value) {
+            return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function highlightKeyword(section, query) {
+            clearSearchHighlights();
+            const term = query.trim();
+            if (!term) return;
+
+            const pattern = new RegExp(escapeRegExp(term), 'gi');
+            const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    const parent = node.parentElement;
+                    if (!parent || !node.nodeValue.match(pattern)) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+
+                    if (parent.closest('script, style, mark, input, select, textarea, button, svg, ion-icon')) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+
+            const nodes = [];
+            while (walker.nextNode()) {
+                nodes.push(walker.currentNode);
+            }
+
+            nodes.forEach((node) => {
+                const fragment = document.createDocumentFragment();
+                let lastIndex = 0;
+                node.nodeValue.replace(pattern, (match, index) => {
+                    fragment.append(document.createTextNode(node.nodeValue.slice(lastIndex, index)));
+                    const mark = document.createElement('mark');
+                    mark.className = 'search-highlight';
+                    mark.textContent = match;
+                    fragment.append(mark);
+                    lastIndex = index + match.length;
+                    return match;
+                });
+                fragment.append(document.createTextNode(node.nodeValue.slice(lastIndex)));
+                node.replaceWith(fragment);
+            });
+        }
+
+        function flashSearchHit(section) {
+            section.classList.remove('section-search-hit');
+            requestAnimationFrame(() => {
+                section.classList.add('section-search-hit');
+                window.setTimeout(() => section.classList.remove('section-search-hit'), 1400);
+            });
+        }
+
+        function runSiteSearch(event) {
+            event.preventDefault();
+            const input = document.querySelector('[data-site-search-input]');
+            const match = searchSections(input.value);
+
+            if (!match) {
+                input.setCustomValidity(input.value.trim() ? 'No matching section found.' : 'Enter a keyword.');
+                input.reportValidity();
+                window.setTimeout(() => input.setCustomValidity(''), 1200);
+                return;
+            }
+
+            input.setCustomValidity('');
+            switchSection(match.id);
+            requestAnimationFrame(() => {
+                highlightKeyword(match, input.value);
+                flashSearchHit(match);
+            });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach((button) => {
+                button.classList.toggle('active', button.dataset.tabTarget === tabId);
+            });
+            document.querySelectorAll('.accordion').forEach((panel) => {
+                panel.classList.toggle('active', panel.id === tabId);
+            });
+        }
+
+        function initializeVisibleCharts(sectionId) {
+            if (sectionId === 'predictor') initRiskChart();
+        }
+
+        function initRiskChart() {
+            if (charts.riskChart) return;
+            const startingRisk = Math.max(0, Math.min(100, Number(initialResult?.confidence || 0)));
+            const startingPalette = riskChartPalette(startingRisk);
+            charts.riskChart = new Chart(document.getElementById('riskChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Risk', 'Remaining'],
+                    datasets: [{
+                        data: [startingRisk, 100 - startingRisk],
+                        backgroundColor: [startingPalette.risk, startingPalette.remaining],
+                        borderColor: startingPalette.border,
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '74%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                }
+            });
+            if (initialResult) {
+                renderModelResult(initialResult, 'Ready with the current model prediction.');
+            }
+        }
+
+        function renderList(id, items) {
+            const list = document.getElementById(id);
+            list.innerHTML = '';
+            items.forEach((item) => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                list.appendChild(li);
+            });
+        }
+
+        function renderModelResult(result, statusText) {
+            const risk = Math.max(0, Math.min(100, Number(result.confidence || 0)));
+            const label = result.label === 'Likely to Dropout' ? 'Dropout' : 'Non-Dropout';
+            lastRisk = risk;
+
+            if (charts.riskChart) {
+                const palette = riskChartPalette(risk);
+                charts.riskChart.data.datasets[0].data = [risk, 100 - risk];
+                charts.riskChart.data.datasets[0].backgroundColor = [palette.risk, palette.remaining];
+                charts.riskChart.data.datasets[0].borderColor = palette.border;
+                charts.riskChart.update();
+            }
+
+            document.getElementById('riskPercent').textContent = `${risk.toFixed(1).replace('.0', '')}%`;
+            document.getElementById('riskLevel').textContent = `${result.risk_level} Risk`;
+            const status = document.getElementById('analysisStatus');
+            status.textContent = statusText || `Analyzed current inputs with the trained model. Dropout probability is ${risk.toFixed(1).replace('.0', '')}%.`;
+            status.classList.remove('pending');
+
+            const predictionLabel = document.getElementById('predictionLabel');
+            predictionLabel.textContent = label;
+            predictionLabel.classList.toggle('dropout', label === 'Dropout');
+            renderList('factorList', result.factors || []);
+            renderList('actionList', result.actions || []);
+        }
+
+        async function requestPrediction() {
+            const form = document.getElementById('predictorForm');
+            const response = await fetch(form.dataset.apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Prediction failed');
+            }
+            return data;
+        }
+
+        function markRiskPending() {
+            const status = document.getElementById('analysisStatus');
+            const button = document.getElementById('analyzeBtn');
+            status.textContent = 'Inputs changed. Click Analyze Risk to refresh the snapshot.';
+            status.classList.add('pending');
+            button.textContent = 'Analyze Updated Inputs';
+        }
+
+        async function analyzeRisk() {
+            const button = document.getElementById('analyzeBtn');
+            button.textContent = 'Analyzing...';
+            button.disabled = true;
+            try {
+                const result = await requestPrediction();
+                renderModelResult(result);
+            } catch (error) {
+                const status = document.getElementById('analysisStatus');
+                status.textContent = error.message;
+                status.classList.add('pending');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Analyze Risk';
+            }
+        }
+
+        document.querySelectorAll('[data-section-target]').forEach((item) => {
+            item.addEventListener('click', () => switchSection(item.dataset.sectionTarget));
+        });
+
+        document.querySelectorAll('[data-tab-target]').forEach((button) => {
+            button.addEventListener('click', () => switchTab(button.dataset.tabTarget));
+        });
+
+        document.querySelector('[data-mobile-menu]').addEventListener('click', () => {
+            document.body.classList.toggle('sidebar-open');
+        });
+
+        document.querySelector('[data-theme-toggle]').addEventListener('click', () => {
+            const nextTheme = document.body.classList.contains('light-theme') ? 'dark' : 'light';
+            localStorage.setItem('acadwatch-theme', nextTheme);
+            applyTheme(nextTheme);
+        });
+
+        document.querySelector('[data-site-search]').addEventListener('submit', runSiteSearch);
+
+        document.getElementById('predictorForm').addEventListener('input', markRiskPending);
+        document.getElementById('predictorForm').addEventListener('change', markRiskPending);
+        document.getElementById('analyzeBtn').addEventListener('click', analyzeRisk);
+
+        initializeVisibleCharts('overview');
+    </script>

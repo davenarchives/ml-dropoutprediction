@@ -1,0 +1,36 @@
+            <section id="evaluation" class="content-section">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Evaluation</p>
+                        <h2>Final Model Performance</h2>
+                        <p class="lead">Evaluation combines summary metrics, confusion matrix behavior, classification report detail, and ROC curve shape.</p>
+                    </div>
+                </div>
+                <div class="metric-grid">
+                    <article class="card"><span class="stat-value">0.8825</span><span class="stat-label">Accuracy</span></article>
+                    <article class="card"><span class="stat-value">0.8811</span><span class="stat-label">Precision</span></article>
+                    <article class="card"><span class="stat-value">0.8825</span><span class="stat-label">Recall</span></article>
+                    <article class="card"><span class="stat-value">0.8809</span><span class="stat-label">F1</span></article>
+                </div>
+                <div class="grid-two" style="margin-top:18px">
+                    <article class="chart-card">
+                        <h3>Confusion Matrix</h3>
+                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='comparison-and-eval/confusionmatrix.png') }}" alt="Random Forest confusion matrix">
+                    </article>
+                    <article class="chart-card">
+                        <h3>ROC Curve</h3>
+                        <img class="asset-image compact" src="{{ url_for('dashboard.project_asset', filename='comparison-and-eval/roccurve.png') }}" alt="Random Forest ROC curve">
+                    </article>
+                </div>
+                <div class="table-wrap" style="margin-top:18px">
+                    <div class="table-title"><h3>Classification Report</h3></div>
+                    <table>
+                        <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
+                        <tbody>
+                            <tr><td>Non-Dropout</td><td>0.90</td><td>0.94</td><td>0.92</td><td>601</td></tr>
+                            <tr><td>Dropout</td><td>0.85</td><td>0.77</td><td>0.81</td><td>284</td></tr>
+                            <tr><td>Weighted Avg</td><td>0.88</td><td>0.88</td><td>0.88</td><td>885</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
